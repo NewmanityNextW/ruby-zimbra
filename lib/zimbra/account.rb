@@ -18,6 +18,14 @@ module Zimbra
         AccountService.create(account)
       end
 
+      def get_info_by_name(name, attributes)
+        AccountService.get_info_by_name(name, attributes)
+      end
+
+      def modify(account)
+        AccountService.modify(account)
+      end
+
       def acl_name
         'usr'
       end
@@ -64,6 +72,7 @@ module Zimbra
     def create(account)
       xml = invoke("n2:CreateAccountRequest") do |message|
         Builder.create(message, account)
+      puts message
       end
       Parser.account_response(xml/"//n2:account")
     end
@@ -82,6 +91,14 @@ module Zimbra
       end
       return nil if soap_fault_not_found?
       Parser.account_response(xml/"//n2:account")
+    end
+
+    def get_info_by_name(name, attributes = [])
+      xml = invoke("n2:GetAccountRequest") do |message|
+        Builder.get_by_name(message, name)
+      end
+      return nil if soap_fault_not_found?
+      Parser.account_response(xml/"//n2:account", attributes)
     end
 
     def modify(account)
@@ -128,8 +145,13 @@ module Zimbra
 
         def modify(message, account)
           message.add 'id', account.id
-          modify_attributes(message, distribution_list)
+          A.inject(message, 'zimbraCOSId', account.cos_id)
+          account.attributes.each do |k,v|
+            A.inject(message, k, v)
+          end
+          #modify_attributes(message, account)
         end
+
         def modify_attributes(message, account)
           if account.acls.empty?
             ACL.delete_all(message)
@@ -160,13 +182,18 @@ module Zimbra
           end
         end
 
-        def account_response(node)
+        def account_response(node, attributes = [])
           id = (node/'@id').to_s
           name = (node/'@name').to_s
           acls = Zimbra::ACL.read(node)
           cos_id = Zimbra::A.read(node, 'zimbraCOSId')
           delegated_admin = Zimbra::A.read(node, 'zimbraIsDelegatedAdminAccount')
-          Zimbra::Account.new(:id => id, :name => name, :acls => acls, :cos_id => cos_id, :delegated_admin => delegated_admin)
+          attributes_ret = []
+          attributes.each do |a|
+            v = Zimbra::A.read(node, a)
+            attributes_ret << {a => v}
+          end
+          Zimbra::Account.new(:id => id, :name => name, :acls => acls, :cos_id => cos_id, :delegated_admin => delegated_admin, :attributes => attributes_ret)
         end
       end
     end

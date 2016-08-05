@@ -40,7 +40,7 @@ module Zimbra
       doc.add_namespace 'n2', "urn:zimbraAdmin"
     end
   end
-  
+
   module HandsoapUriOverrides
     def uri
       Zimbra.admin_api_url
