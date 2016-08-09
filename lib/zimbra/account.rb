@@ -72,7 +72,6 @@ module Zimbra
     def create(account)
       xml = invoke("n2:CreateAccountRequest") do |message|
         Builder.create(message, account)
-      puts message
       end
       Parser.account_response(xml/"//n2:account")
     end

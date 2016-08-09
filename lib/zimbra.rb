@@ -27,15 +27,15 @@ module Zimbra
     def admin_api_url=(url)
       @@admin_api_url = url
     end
-    
+
     def account_api_url
       @@account_api_url
     end
-    
+
     def account_api_url=(url)
       @@account_api_url = url
     end
-    
+
     # Turn debugging on/off.  Outputs full SOAP conversations to stdout.
     #   Zimbra.debug = true
     #   Zimbra.debug = false
@@ -48,12 +48,14 @@ module Zimbra
     def debug
       @@debug ||= false
     end
-
+    def set_auth_token(val)
+      @@auth_token = val
+    end
     # Authorization token - obtained after successful login
     def auth_token
       @@auth_token
     end
-    
+
     def account_auth_token
       @@account_auth_token
     end
@@ -69,7 +71,7 @@ module Zimbra
     def reset_login(username, password)
       @@auth_token = Auth.login(username, password)
     end
-    
+
     def account_login(username)
       delegate_auth_token = DelegateAuthToken.for_account_name(username)
       return false unless delegate_auth_token
