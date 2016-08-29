@@ -61,6 +61,10 @@ module Zimbra
     def add_alias(alias_name)
       AccountService.add_alias(self,alias_name)
     end
+
+    def rename(newname)
+      AccountService.rename(self, newname)
+    end
   end
 
   class AccountService < HandsoapService
@@ -116,6 +120,13 @@ module Zimbra
     def add_alias(account,alias_name)
       xml = invoke('n2:AddAccountAliasRequest') do |message|
         Builder.add_alias(message,account.id,alias_name)
+      end
+    end
+
+    def rename(account, newname)
+      xml = invoke('n2:RenameAccountRequest') do |message|
+        message.add 'id', account.id
+        message.add 'newName', newname
       end
     end
 
