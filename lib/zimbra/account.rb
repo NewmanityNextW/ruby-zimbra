@@ -65,6 +65,10 @@ module Zimbra
     def rename(newname)
       AccountService.rename(self, newname)
     end
+
+    def change_password(new_password)
+      AccountService.change_password(self, new_password)
+    end
   end
 
   class AccountService < HandsoapService
@@ -127,6 +131,13 @@ module Zimbra
       xml = invoke('n2:RenameAccountRequest') do |message|
         message.add 'id', account.id
         message.add 'newName', newname
+      end
+    end
+
+    def change_password(account, new_password)
+      xml = invoke('n2:SetPasswordRequest') do |message|
+        message.add 'id', account.id
+        message.add 'newPassword', new_password
       end
     end
 
