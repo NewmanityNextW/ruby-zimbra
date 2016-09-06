@@ -3,6 +3,10 @@ module Zimbra
     def self.login(username, password)
       AuthService.login(username, password)
     end
+
+    def self.account_login(username, password)
+      AuthService.account_login(username, password)
+    end
   end
 
   class AuthService < Handsoap::Service
@@ -24,10 +28,28 @@ module Zimbra
       Parser.auth_token(xml)
     end
 
+    def account_login(username, password)
+      xml = invoke('n3:AuthRequest') do |message|
+        Builder.account_auth(message, username, password)
+      end
+      Parser.auth_token_account(xml)
+    end
+
     class Builder
       class << self
         def auth(message, username, password)
           message.add 'name', username
+          message.add 'password', password
+        end
+
+        def get_by_name(message, name)
+          message.add 'account', name do |c|
+            c.set_attr 'by', 'name'
+          end
+        end
+
+        def account_auth(message, username, password)
+          Builder.get_by_name(message, username)
           message.add 'password', password
         end
       end
@@ -36,6 +58,10 @@ module Zimbra
       class << self
         def auth_token(response)
           (response/'//n2:authToken').to_s
+        end
+
+        def auth_token_account(response)
+          (response/'//n3:authToken').to_s
         end
       end
     end

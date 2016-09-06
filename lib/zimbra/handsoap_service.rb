@@ -34,10 +34,12 @@ module Zimbra
     def request_namespaces(doc)
       doc.alias 'n1', "urn:zimbra"
       doc.alias 'n2', "urn:zimbraAdmin"
+      doc.alias 'n3', "urn:zimbraAccount"
       doc.alias 'env', 'http://schemas.xmlsoap.org/soap/envelope/'
     end
     def response_namespaces(doc)
       doc.add_namespace 'n2', "urn:zimbraAdmin"
+      doc.add_namespace 'n3', "urn:zimbraAccount"
     end
   end
 
