@@ -206,7 +206,7 @@ module Zimbra
         def account_response(node, attributes = [])
           id = (node/'@id').to_s
           name = (node/'@name').to_s
-          acls = Zimbra::ACL.read(node)
+          #acls = Zimbra::ACL.read(node)
           cos_id = Zimbra::A.read(node, 'zimbraCOSId')
           delegated_admin = Zimbra::A.read(node, 'zimbraIsDelegatedAdminAccount')
           attributes_ret = []
@@ -214,7 +214,7 @@ module Zimbra
             v = Zimbra::A.read(node, a)
             attributes_ret << {a => v}
           end
-          Zimbra::Account.new(:id => id, :name => name, :acls => acls, :cos_id => cos_id, :delegated_admin => delegated_admin, :attributes => attributes_ret)
+          Zimbra::Account.new(:id => id, :name => name,  :cos_id => cos_id, :delegated_admin => delegated_admin, :attributes => attributes_ret)
         end
       end
     end
