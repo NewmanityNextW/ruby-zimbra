@@ -31,14 +31,14 @@ module Zimbra
       end
     end
 
-    attr_accessor :id, :name, :password, :acls, :cos_id, :delegated_admin, :attributes
+    attr_accessor :id, :name, :password, :acls, :delegated_admin, :attributes
 
     def initialize(options = {})
       self.id = options[:id]
       self.name = options[:name]
       self.password = options[:password]
       self.acls = options[:acls] || []
-      self.cos_id = (options[:cos] ? options[:cos].id : options[:cos_id])
+      #self.cos_id = (options[:cos] ? options[:cos].id : options[:cos_id])
       self.delegated_admin = options[:delegated_admin]
       self.attributes = options[:attributes] || []
     end
@@ -146,7 +146,7 @@ module Zimbra
         def create(message, account)
           message.add 'name', account.name
           message.add 'password', account.password
-          A.inject(message, 'zimbraCOSId', account.cos_id)
+        #  A.inject(message, 'zimbraCOSId', account.cos_id)
           account.attributes.each do |k,v|
             A.inject(message, k, v)
           end
@@ -166,7 +166,7 @@ module Zimbra
 
         def modify(message, account)
           message.add 'id', account.id
-          A.inject(message, 'zimbraCOSId', account.cos_id)
+        #  A.inject(message, 'zimbraCOSId', account.cos_id)
           account.attributes.each do |k,v|
             A.inject(message, k, v)
           end
@@ -174,14 +174,14 @@ module Zimbra
         end
 
         def modify_attributes(message, account)
-          if account.acls.empty?
-            ACL.delete_all(message)
-          else
-            account.acls.each do |acl|
-              acl.apply(message)
-            end
-          end
-          Zimbra::A.inject(node, 'zimbraCOSId', account.cos_id)
+          # if account.acls.empty?
+          #   ACL.delete_all(message)
+          # else
+          #   account.acls.each do |acl|
+          #     acl.apply(message)
+          #   end
+          # end
+          #Zimbra::A.inject(node, 'zimbraCOSId', account.cos_id)
           Zimbra::A.inject(node, 'zimbraIsDelegatedAdminAccount', (delegated_admin ? 'TRUE' : 'FALSE'))
         end
 
@@ -207,14 +207,14 @@ module Zimbra
           id = (node/'@id').to_s
           name = (node/'@name').to_s
           #acls = Zimbra::ACL.read(node)
-          cos_id = Zimbra::A.read(node, 'zimbraCOSId')
+          #cos_id = Zimbra::A.read(node, 'zimbraCOSId')
           delegated_admin = Zimbra::A.read(node, 'zimbraIsDelegatedAdminAccount')
           attributes_ret = []
           attributes.each do |a|
             v = Zimbra::A.read(node, a)
             attributes_ret << {a => v}
           end
-          Zimbra::Account.new(:id => id, :name => name,  :cos_id => cos_id, :delegated_admin => delegated_admin, :attributes => attributes_ret)
+          Zimbra::Account.new(:id => id, :name => name,  :delegated_admin => delegated_admin, :attributes => attributes_ret)
         end
       end
     end
