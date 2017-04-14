@@ -16,7 +16,7 @@ module Zimbra
       self.lifetime = args[:lifetime]
     end
   end
-  
+
   class DelegateAuthTokenService < HandsoapService
     def get_by_account_name(account_name)
       xml = invoke("n2:DelegateAuthRequest") do |message|
@@ -25,7 +25,7 @@ module Zimbra
       return nil unless xml
       Parser.delegate_auth_token_response(account_name, xml)
     end
-    
+
     class Builder
       class << self
         def get_by_account_name(message, account_name)
@@ -40,8 +40,8 @@ module Zimbra
         def delegate_auth_token_response(account_name, response)
           auth_token = (response/'//n2:authToken').to_s
           lifetime = (response/'//n2:lifetime').to_i
-          
-          Zimbra::DelegateAuthToken.new(account_name: account_name, token: auth_token, lifetime: lifetime) 
+
+          Zimbra::DelegateAuthToken.new(account_name: account_name, token: auth_token, lifetime: lifetime)
         end
       end
     end
